@@ -34,8 +34,8 @@ GTT.Factories.GDAX.FeedFactory(logger, products).then((feed: GDAXFeed) => {
     // Configure all message streams to use the same websocket feed
     // Create the source message streams by creating a MessageStream for each product, using the same WS feed for each
     const streams = products.map((product) => new GTT.Core.ProductFilter({ logger: logger, productId: product }));
-    // Let's grab a simple FXService object that uses Yahoo Finance as its source
-    const fxService = GTT.Factories.SimpleFXServiceFactory('yahoo', logger);
+    // Let's grab a simple FXService object that uses ExchangeRatesAPI as its source
+    const fxService = GTT.Factories.SimpleFXServiceFactory('exchangeratesapi', logger);
     // We add the EUR and GBP exchange rates and reset the refresh interval to 1 minute
     fxService
         .addCurrencyPair({ from: 'GBP', to: 'USD' })

@@ -71,8 +71,7 @@ The filter also exposes a single method `getRate` that allows you to obtain the 
 # FX Service
 
 A little more effort is required to configure the FX Service. The Service comprises two sub-components. The first, `FXProvider`
- determines how the exchange rates are obtained, typically via an external service. `YahooFXProvider` and `OpenExchangeProvider`
- are provided out of the box, which retrieves data from Yahoo finance and [OpenExchangeRates](http://openExchangeRates.org) respectively. For crypto pricing, we also provide `coinmarketcap`,
+ determines how the exchange rates are obtained, typically via an external service. `ExchangeRatesAPIProvider` and `OpenExchangeProvider` are provided out of the box, which retrieves data from [ExchangeRatesAPI](https://exchangeratesapi.io/) respectively. For crypto pricing, we also provide `coinmarketcap`,
  which loads prices from [coimarketcap.com](https://coimarketcap.com).
 
  {% include note.html content="To use OpenExchangeRates, you'll need to supply an API key based on your subscription plan. They do offer a free option which will allow you to obtain hourly updates on exchange rates." %}
@@ -86,10 +85,10 @@ A little more effort is required to configure the FX Service. The Service compri
 
 This can all be a little hairy to begin with, so to keep things simple, we've wrapped up the most common configuration options
 and provided the `SimpleFXServiceFactory` method that merely accepts a provider (and a logger) and returns a working `FXService`.
- This service uses a single provider (for now, either 'yahoo' or 'openexchangerates' are accepted) and a `SimpleRateCalculator`
+ This service uses a single provider (for now, either 'exchangeratesapi' or 'openexchangerates' are accepted) and a `SimpleRateCalculator`
  that simply returns the latest spot price for the exchange rate; and is updated every ten minutes.
 
-    const fxService = SimpleFXServiceFactory('yahoo', logger);
+    const fxService = SimpleFXServiceFactory('exchangeratesapi', logger);
 
 {% include warning.html content="This simple service is fine for demonstrations, but for production services, or if you're working with real money, you should consider a more robust FXService. If an API malfunction suddenly returns zero or Infinity as a price, the Simple service can lead to ruinous problems." %}
 
@@ -114,9 +113,9 @@ The feed has messages from all three books mixed up in it, So we need to pipe it
 
     const streams = products.map(product => new GTT.Core.ProductFilter({ logger: logger, productId: product }));
 
-We then create our FXService and add the currency pairs we want it to fetch from Yahoo finance, and ask it to update every minute:
+We then create our FXService and add the currency pairs we want it to fetch from ExchangeRatesAPI, and ask it to update every minute:
 
-    const fxService = GTT.Factories.SimpleFXServiceFactory('yahoo', logger);
+    const fxService = GTT.Factories.SimpleFXServiceFactory('exchangeratesapi', logger);
     fxService
         .addCurrencyPair({ from: 'GBP', to: 'USD' })
         .addCurrencyPair({ from: 'EUR', to: 'USD' })

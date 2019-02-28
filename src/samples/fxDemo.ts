@@ -12,7 +12,7 @@
  * License for the specific language governing permissions and limitations under the License.                              *
  ***************************************************************************************************************************/
 
-import YahooFinanceFXProvider from '../FXService/providers/YahooFXProvider';
+import ExchangeRatesAPIProvider from '../FXService/providers/ExchangeRatesAPIProvider';
 import { FXObject, FXProvider } from '../FXService/FXProvider';
 import { ConsoleLoggerFactory } from '../utils/Logger';
 import { FXRates, FXService, FXServiceConfig } from '../FXService/FXService';
@@ -21,8 +21,8 @@ import SimpleRateCalculator from '../FXService/calculators/SimpleRateCalculator'
 import CoinMarketCapProvider from '../FXService/providers/CoinMarketCapProvider';
 
 const logger = ConsoleLoggerFactory();
-const yahooFXProvider: FXProvider = new YahooFinanceFXProvider({ logger: logger });
-const simpleCalculator: FXRateCalculator = new SimpleRateCalculator(yahooFXProvider, logger);
+const fxProvider: FXProvider = new ExchangeRatesAPIProvider({ logger: logger });
+const simpleCalculator: FXRateCalculator = new SimpleRateCalculator(fxProvider, logger);
 
 const fxServiceConfig: FXServiceConfig = {
     logger: logger,

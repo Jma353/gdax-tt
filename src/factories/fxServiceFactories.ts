@@ -15,32 +15,39 @@
 import SimpleRateCalculator from '../FXService/calculators/SimpleRateCalculator';
 import { ConsoleLoggerFactory, Logger } from '../utils/Logger';
 import { FXProviderConfig } from '../FXService/FXProvider';
-import YahooFinanceFXProvider from '../FXService/providers/YahooFXProvider';
+import ExchangeRatesAPIFXProvider from '../FXService/providers/ExchangeRatesAPIProvider';
 import OpenExchangeProvider, { OpenExchangeConfig } from '../FXService/providers/OpenExchangeProvider';
 import { FXService, FXServiceConfig } from '../FXService/FXService';
 import CoinMarketCapProvider from '../FXService/providers/CoinMarketCapProvider';
 
 /**
+ * Describes FXProvider types - passed into factory functions in order to 
+ * instantiate various FXProviders
+ * NOTE: OpenExchangeRates requires the API key to be specifies in the 
+ *       OPENEXCHANGERATE_KEY environment variable.
+ */
+type FXProviderType = 'exchangeratesapi' | 'openexchangerates' | 'coinmarketcap';
+
+/**
  * Create and return a new FXProvider.
- * @param provider {string} Allowed values are 'yahoo' and 'openexhangerates'. OpenExchangeRates requires the API key to
- * be specifies in the OPENEXCHANGERATE_KEY environment variable.
+ * @param provider {FXProviderType} Type of FXProvider to create
  * @param logger {Logger} An existing logger object.
  * @constructor
  */
-export function FXProviderFactory(provider: string, logger: Logger) {
+export function FXProviderFactory(provider: FXProviderType, logger: Logger) {
     const baseConfig: FXProviderConfig = {
         logger: logger
     };
-    switch (provider.toLowerCase()) {
-        case 'yahoo':
-            return new YahooFinanceFXProvider(baseConfig);
+    switch (provider) {
+        case 'exchangeratesapi':
+            return new ExchangeRatesAPIFXProvider(baseConfig);
         case 'openexchangerates':
             const config: OpenExchangeConfig = { ...baseConfig, apiKey: process.env.OPENEXCHANGERATE_KEY };
             return new OpenExchangeProvider(config);
         case 'coinmarketcap':
             return new CoinMarketCapProvider(baseConfig);
         default:
-            return new YahooFinanceFXProvider(baseConfig);
+            return new ExchangeRatesAPIFXProvider(baseConfig);
     }
 }
 
@@ -55,11 +62,11 @@ export function FXProviderFactory(provider: string, logger: Logger) {
  *   const service = SimpleFXServiceFactory().addCurrencyePair({ from: 'USD', to: 'EUR'});
  * ```
  *
- * @param provider {string} Either 'yahoo', 'openexchangerates' or 'coinmarketcap'. For OER, the OPENEXCHANGE_KEY envar must be set
+ * @param provider {FXProviderType} Type of FXProvider to create
  * @param logger {Logger} If not specified a new ConsoleLogger will be created
  * @param refreshInterval {number} the period (in ms) to poll the underlying API for new prices
  */
-export function SimpleFXServiceFactory(provider: string = 'yahoo', logger?: Logger, refreshInterval?: number) {
+export function SimpleFXServiceFactory(provider: FXProviderType = 'exchangeratesapi', logger?: Logger, refreshInterval?: number) {
     const log: Logger = logger || ConsoleLoggerFactory();
     const fxProvider = FXProviderFactory(provider, logger);
     const calculator = new SimpleRateCalculator(fxProvider, log);
